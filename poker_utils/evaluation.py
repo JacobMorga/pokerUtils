@@ -55,8 +55,10 @@ def encode_card(*args):
         if rank not in '23456789TJQKA':
             raise ValueError('Invalid rank')
         rank = '23456789TJQKA'.index(rank)
-    if rank not in range(2, 15):
-        raise ValueError('Invalid rank range, use 2-14 for 2-A')
+    # `rank` is stored as a 0-12 index (2..A) after parsing the input above.
+    # Accept the internal index range here (0-12), not the external 2-14 range.
+    if rank not in range(0, 13):
+        raise ValueError('Invalid rank range, use ranks 2-14 for 2-A')
 
     
     suit_index = 'cdhs'.index(suit)
@@ -68,6 +70,10 @@ def encode_card(*args):
     rank_flag = (1 << rank) << 16         # bits 16–28: rank as positional bitmask
 
     return prime | rank_bits | suit_bits | rank_flag
+
+def encode_hand(cards):
+    return [encode_card(c) for c in cards]
+
 
 def evaluate(cards):
 

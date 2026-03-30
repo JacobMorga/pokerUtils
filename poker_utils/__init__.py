@@ -1,1 +1,1 @@
-from .evaluation import encode_card, evaluate, hand_type
+from .evaluation import encode_card, encode_hand, evaluate, hand_type
