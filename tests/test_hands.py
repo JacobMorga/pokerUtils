@@ -13,6 +13,6 @@ hand_rankings = {
 }
 
 def test_straight_flush():
-    hand = [(12,1),(11,1),(10,1),(9,1),(8,1)]
+    hand = ['As','Ks','Qs','Js','Ts']
     hand = [encode_card(*card) for card in hand]
     assert hand_type(evaluate(hand)) == 'straight_flush'

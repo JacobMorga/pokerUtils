@@ -1,4 +1,4 @@
-from .constants import PRIMES, INT_RANK, INT_SUIT, SUIT_MASK
+from .constants import PRIMES
 from .build import load_lookup_tables
 
 FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
@@ -38,24 +38,29 @@ def encode_card(*args):
             rank, suit = rank.upper(), suit.lower()
             
         elif isinstance(rank, int) and isinstance(suit, str): # Form (2, 'c'), (14, 'h'), (9, 's')
-            rank, suit = INT_RANK[rank], suit.lower()
+            rank, suit = rank - 2, suit.lower()
 
         elif isinstance(rank, int) and isinstance(suit, int): # Form (2, 0), (14, 2), (9, 3)
-            rank, suit = INT_RANK[rank], INT_SUIT[suit]
+            rank, suit = rank - 2, 'cdhs'[suit]
 
         else:
             raise ValueError('Invalid card format')
-    
     else:
         raise ValueError('Invalid card format')
 
 
-    if rank not in '23456789TJQKA':
-        raise ValueError('Invalid rank')
     if suit not in 'cdhs':
         raise ValueError('Invalid suit')
-    rank = '23456789TJQKA'.index(rank)
-    suit = SUIT_MASK[suit]
+    if isinstance(rank, str):
+        if rank not in '23456789TJQKA':
+            raise ValueError('Invalid rank')
+        rank = '23456789TJQKA'.index(rank)
+    if rank not in range(2, 15):
+        raise ValueError('Invalid rank range, use 2-14 for 2-A')
+
+    
+    suit_index = 'cdhs'.index(suit)
+    suit = [0b1000, 0b0100, 0b0010, 0b0001][suit_index]
 
     prime     = PRIMES[rank]               # bits 0–5:   prime for rank
     rank_bits = rank << 8                  # bits 8–11:  rank as integer
@@ -97,10 +102,16 @@ def hand_type (rank):
         6186 : 'high_card',
     }
 
-    boundaries = hand_rankings.keys()
+    # Smaller ranks are better. `hand_rankings` values are *lower bounds* for each
+    # category (as produced by `build.py` counters).
+    starts = sorted(hand_rankings.keys())
+    for i, start in enumerate(starts):
+        next_start = starts[i + 1] if i + 1 < len(starts) else None
+        if next_start is None:
+            if rank >= start:
+                return hand_rankings[start]
+        else:
+            if start <= rank < next_start:
+                return hand_rankings[start]
 
-    for upper in reversed(boundaries):
-        if rank <= upper:
-            return hand_rankings[upper]
-    
-    return ValueError('Invalid hand rank')
+    raise ValueError('Invalid hand rank')
