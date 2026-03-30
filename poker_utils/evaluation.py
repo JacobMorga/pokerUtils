@@ -1,4 +1,7 @@
-from build import *
+from .constants import PRIMES
+from .build import load_lookup_tables
+
+FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
 
 #* Card bit representation
 #*
@@ -13,6 +16,7 @@ from build import *
 #*  cdhs = suit bit flags
 #*  b = rank bitmask (for detecting straights/flushes)
 
+# rank: int from 0-12 for 2-A, suit 8,4,2,1 for c,d,h,s 
 def encode_card(rank, suit):
 
     prime     = PRIMES[rank]               # bits 0–5:   prime for rank
@@ -22,8 +26,6 @@ def encode_card(rank, suit):
 
     return prime | rank_bits | suit_bits | rank_flag
 
-
-load_lookup_tables()
 def evaluate(cards):
 
     rank_mask = (cards[0] | cards[1] | cards[2] | cards[3] | cards[4]) >> 16
@@ -61,6 +63,6 @@ def hand_type (rank):
 
     for upper in reversed(boundaries):
         if rank <= upper:
-            return hand_rankings(upper)
+            return hand_rankings[upper]
     
     return ValueError('Invalid hand rank')

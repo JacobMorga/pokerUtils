@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "poker-utils"
+version = "0.1.0"
+description = "Utilities for poker hand evaluation and game logic"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.13"
+authors = [
+  { name = "Jacob Morgan", email = "jacobmrgn@icloud.com" }
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Programming Language :: Python :: 3.13",
+]
+
+dependencies = ["importlib.resources>=6.1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+all = ["poker_utils[dev]"]
+
+[project.urls]
+Homepage = "https://github.com/JacobMorga/pokerUtils"
+Repository = "https://github.com/JacobMorga/pokerUtils"
+Issues = "https://github.com/JacobMorga/pokerUtils/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["poker_utils"]
+include = ["poker_utils/lookup_tables.pkl"]
+
+[tool.hatch.build.targets.sdist]
+include = ["poker_utils/lookup_tables.pkl"]

@@ -1,3 +1,4 @@
+from .constants import PATH, PRIMES
 import pickle
 
 #* Card bit representation
@@ -13,7 +14,16 @@ import pickle
 #*  cdhs = suit bit flags
 #*  b = rank bitmask (for detecting straights/flushes)
 
-def save_lookup_tables(flushes, unique5, pairs, path="lookup_tables.pkl"):
+
+import importlib.resources as res
+
+def load_lookup_tables():
+    with res.files("poker_utils").joinpath(PATH).open("rb") as f:
+        tables = pickle.load(f)
+    return tables["flushes"], tables["unique5"], tables["pairs"]
+
+
+def save_lookup_tables(flushes, unique5, pairs, path=PATH):
 
     with open(path, "wb") as f:
         pickle.dump({
@@ -23,15 +33,8 @@ def save_lookup_tables(flushes, unique5, pairs, path="lookup_tables.pkl"):
         f)
     print(f"Lookup tables saved to {path}")
 
-def load_lookup_tables(path="lookup_tables.pkl"):
-    with open(path, "rb") as f:
-        tables = pickle.load(f)
-    return tables["flushes"], tables["unique5"], tables["pairs"]
 
-
-
-PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41]
-def build_lookup_tables():
+def build_lookup_tables(path=PATH):
 
     flushes = {}
     unique5 = {}
@@ -134,10 +137,12 @@ def build_lookup_tables():
         pairs[product] = hand_rank_counter[htype]
         hand_rank_counter[htype] += 1
 
+    save_lookup_tables(flushes, unique5, pairs)
+
     return flushes, unique5, pairs
 
 if __name__ == '__main__':
+    build_lookup_tables()
 
-    FLUSHES, UNIQUE5, PAIRS = build_lookup_tables()
-    save_lookup_tables(FLUSHES, UNIQUE5, PAIRS)
+
 
