@@ -16,7 +16,12 @@ FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
 #*  cdhs = suit bit flags
 #*  b = rank bitmask (for detecting straights/flushes)
 
-# rank: int from 2-14 for 2-A, suit 0,1,2,3 for c,d,h,s 
+# Accepted card formats:
+# 'As', 'Kh', '2d', '3c'
+# ('2', 'c'), ('Q', 'h'), ('9', 's')
+# (2, 'c'), (14, 'h'), (9, 's')
+# (2, 0), (14, 2), (9, 3)
+# where rank is an integer from 2-14 for 2-A and suit is an integer from 0-3 for c,d,h,s
 def encode_card(*args):
 
     if len(args) == 1: # Form 'As', 'Kh', '2d', '3c'
