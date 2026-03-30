@@ -1,4 +1,4 @@
-from .constants import PRIMES
+from .constants import PRIMES, INT_RANK, INT_SUIT, SUIT_MASK
 from .build import load_lookup_tables
 
 FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
@@ -16,8 +16,41 @@ FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
 #*  cdhs = suit bit flags
 #*  b = rank bitmask (for detecting straights/flushes)
 
-# rank: int from 0-12 for 2-A, suit 8,4,2,1 for c,d,h,s 
-def encode_card(rank, suit):
+# rank: int from 2-14 for 2-A, suit 0,1,2,3 for c,d,h,s 
+def encode_card(*args):
+
+    if len(args) == 1: # Form 'As', 'Kh', '2d', '3c'
+        card = args[0]
+        if isinstance(card, str):
+            rank = card[0].upper()
+            suit = card[1].lower()
+        else:
+            raise ValueError('Invalid card format')
+
+    elif len(args) == 2: 
+        rank, suit = args
+        if isinstance(rank, str) and isinstance(suit, str): # Form ('2', 'c'), ('Q', 'h'), ('9', 's')
+            rank, suit = rank.upper(), suit.lower()
+            
+        elif isinstance(rank, int) and isinstance(suit, str): # Form (2, 'c'), (14, 'h'), (9, 's')
+            rank, suit = INT_RANK[rank], suit.lower()
+
+        elif isinstance(rank, int) and isinstance(suit, int): # Form (2, 0), (14, 2), (9, 3)
+            rank, suit = INT_RANK[rank], INT_SUIT[suit]
+
+        else:
+            raise ValueError('Invalid card format')
+    
+    else:
+        raise ValueError('Invalid card format')
+
+
+    if rank not in '23456789TJQKA':
+        raise ValueError('Invalid rank')
+    if suit not in 'cdhs':
+        raise ValueError('Invalid suit')
+    rank = '23456789TJQKA'.index(rank)
+    suit = SUIT_MASK[suit]
 
     prime     = PRIMES[rank]               # bits 0–5:   prime for rank
     rank_bits = rank << 8                  # bits 8–11:  rank as integer
