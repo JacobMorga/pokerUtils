@@ -4,7 +4,7 @@ import math
 import random
 from collections import Counter
 
-from poker_utils.evaluation import encode_card, evaluate, hand_type
+from poker_utils.evaluation import *
 
 
 
@@ -22,7 +22,8 @@ def test_hand_type_known_examples():
     ]
     for set in known_hands:
         hand, expected = set
-        assert hand_type(evaluate(hand)) == expected
+        hand = encode_hand(hand)
+        assert hand_type(score_hand(hand)) == expected
 
 
 def test_hand_type_distribution(n=1_000_000) -> None:

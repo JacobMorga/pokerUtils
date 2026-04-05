@@ -24,6 +24,7 @@ FLUSHES, UNIQUE5, PAIRS = load_lookup_tables()
 # where rank is an integer from 2-14 for 2-A and suit is an integer from 0-3 for c,d,h,s
 def encode_card(*args):
 
+    # Normalize input
     if len(args) == 1: # Form 'As', 'Kh', '2d', '3c'
         card = args[0]
         if isinstance(card, str):
@@ -48,7 +49,7 @@ def encode_card(*args):
     else:
         raise ValueError('Invalid card format')
 
-
+    # Check validity
     if suit not in 'cdhs':
         raise ValueError('Invalid suit')
     if isinstance(rank, str):
@@ -58,9 +59,9 @@ def encode_card(*args):
     # `rank` is stored as a 0-12 index (2..A) after parsing the input above.
     # Accept the internal index range here (0-12), not the external 2-14 range.
     if rank not in range(0, 13):
-        raise ValueError('Invalid rank range, use ranks 2-14 for 2-A')
+        raise ValueError('Invalid rank range, use ranks [2,14] for 2-A')
 
-    
+    # Encode card
     suit_index = 'cdhs'.index(suit)
     suit = [0b1000, 0b0100, 0b0010, 0b0001][suit_index]
 
@@ -75,7 +76,7 @@ def encode_hand(cards):
     return [encode_card(c) for c in cards]
 
 
-def evaluate(cards):
+def score5(cards): # return a score for a 5 card hand
 
     rank_mask = (cards[0] | cards[1] | cards[2] | cards[3] | cards[4]) >> 16
     suit_mask = cards[0] & cards[1] & cards[2] & cards[3] & cards[4] & 0xF000
@@ -94,6 +95,12 @@ def evaluate(cards):
         prime_product *= card & 0x3F    # extract bits 0–5 (the prime)
 
     return PAIRS[prime_product]
+
+def score_hands(*args):
+    hands = list(args) # tupules, list, multiple inputs
+    
+
+
 
 def hand_type (rank):
     hand_rankings = {

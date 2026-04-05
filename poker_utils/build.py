@@ -1,4 +1,4 @@
-from .constants import PATH, PRIMES
+from .constants import HASH_PATH, PRIMES
 import pickle
 
 #* Card bit representation
@@ -18,12 +18,12 @@ import pickle
 import importlib.resources as res
 
 def load_lookup_tables():
-    with res.files("poker_utils").joinpath(PATH).open("rb") as f:
+    with res.files("poker_utils").joinpath(HASH_PATH).open("rb") as f:
         tables = pickle.load(f)
     return tables["flushes"], tables["unique5"], tables["pairs"]
 
 
-def save_lookup_tables(flushes, unique5, pairs, path=PATH):
+def save_lookup_tables(flushes, unique5, pairs, path=HASH_PATH):
 
     with open(path, "wb") as f:
         pickle.dump({
@@ -34,7 +34,7 @@ def save_lookup_tables(flushes, unique5, pairs, path=PATH):
     print(f"Lookup tables saved to {path}")
 
 
-def build_lookup_tables(path=PATH):
+def build_lookup_tables(path=HASH_PATH):
 
     flushes = {}
     unique5 = {}
@@ -137,7 +137,7 @@ def build_lookup_tables(path=PATH):
         pairs[product] = hand_rank_counter[htype]
         hand_rank_counter[htype] += 1
 
-    save_lookup_tables(flushes, unique5, pairs)
+    save_lookup_tables(flushes, unique5, pairs, path)
 
     return flushes, unique5, pairs
 
