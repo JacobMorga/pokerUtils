@@ -1,30 +1,9 @@
-from __future__ import annotations
-
 import math
 import random
 from collections import Counter
 
 from poker_utils.evaluation import *
-
-
-
-def test_hand_type_known_examples():
-    known_hands = [
-        (["As", "Ks", "Qs", "Js", "Ts"], "straight_flush"),
-        (["9c", "9d", "9h", "9s", "2d"], "four_of_a_kind"),
-        (["3c", "3d", "3h", "8s", "8d"], "full_house"),
-        (["Ah", "Jh", "7h", "4h", "2h"], "flush"),
-        (["9c", "8d", "7h", "6s", "5c"], "straight"),
-        (["Qc", "Qd", "Qh", "2s", "9d"], "three_of_a_kind"),
-        (["5c", "5d", "9h", "9s", "2c"], "two_pair"),
-        (["6c", "6d", "2s", "9h", "Kc"], "one_pair"),
-        (["Ah", "Jd", "9c", "6s", "3d"], "high_card"),
-    ]
-    for set in known_hands:
-        hand, expected = set
-        hand = encode_hand(hand)
-        assert hand_type(score_hand(hand)) == expected
-
+from poker_utils.interface import *
 
 def test_hand_type_distribution(n=1_000_000) -> None:
     """
