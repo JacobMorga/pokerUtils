@@ -18,47 +18,42 @@ from .evaluation import score5
 # 'As', 'Kh', '2d', '3c'
 # ('2', 'c'), ('Q', 'h'), ('9', 's')
 # (2, 'c'), (14, 'h'), (9, 's')
-# (2, 0), (14, 2), (9, 3)
-# where rank is an integer from 2-14 for 2-A and suit is an integer from 0-3 for c,d,h,s
-def encode_card(*args):
+# (2, 0), (14, 2), (9, 3) - where rank is an integer from 2-14 for 2-A and suit is an integer from 0-3 for c,d,h,s
+# must be [rank, suit] order, eg (2,3) case is ambiguous
+def encode_card(card):
 
     # Normalize input
-    if len(args) == 1: # Form 'As', 'Kh', '2d', '3c'
-        card = args[0]
-        if isinstance(card, str):
-            rank = card[0].upper()
-            suit = card[1].lower()
-        else:
-            raise ValueError('Invalid card format')
+    rank, suit = card[0] # splits form 'As' into ('A','s')
 
-    elif len(args) == 2: 
-        rank, suit = args
-        if isinstance(rank, str) and isinstance(suit, str): # Form ('2', 'c'), ('Q', 'h'), ('9', 's')
-            rank, suit = rank.upper(), suit.lower()
-            
-        elif isinstance(rank, int) and isinstance(suit, str): # Form (2, 'c'), (14, 'h'), (9, 's')
-            rank, suit = rank - 2, suit.lower()
+    if isinstance(rank, str) and isinstance(suit, str): # Form ('2', 'c'), ('Q', 'h'), ('A', 's')
+        rank, suit = rank.upper(), suit.lower()
+        
+    elif isinstance(rank, int) and isinstance(suit, str): # Form (2, 'c'), (12, 'h'), (14, 's')
+        rank, suit = rank - 2, suit.lower()
 
-        elif isinstance(rank, int) and isinstance(suit, int): # Form (2, 0), (14, 2), (9, 3)
-            rank, suit = rank - 2, 'cdhs'[suit]
+    elif isinstance(rank, str) and isinstance(suit, int): # Form ('2', 0), ('Q', 2), ('A', 3)
+        rank, suit = rank.upper(), 'cdhs'[suit]
 
-        else:
-            raise ValueError('Invalid card format')
+    elif isinstance(rank, int) and isinstance(suit, int): # Form (2, 0), (12, 2), (14, 3)
+        rank, suit = rank - 2, 'cdhs'[suit]
+
     else:
         raise ValueError('Invalid card format')
+    
 
     # Check validity
     if suit not in 'cdhs':
         raise ValueError('Invalid suit')
+    
     if isinstance(rank, str):
         if rank not in '23456789TJQKA':
             raise ValueError('Invalid rank')
         rank = '23456789TJQKA'.index(rank)
     # `rank` is stored as a 0-12 index (2..A) after parsing the input above.
     # Accept the internal index range here (0-12), not the external 2-14 range.
-    if rank not in range(0, 13):
+    if rank not in range(0, 13): # [0,12)
         raise ValueError('Invalid rank range, use ranks [2,14] for 2-A')
-
+    
     # Encode card
     suit_index = 'cdhs'.index(suit)
     suit = [0b1000, 0b0100, 0b0010, 0b0001][suit_index]
